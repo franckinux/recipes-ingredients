@@ -1,0 +1,5 @@
+recipe: meteil
+loss-rate: 1.03
+dough-weight: 1.3
+bread-baked-weight: 1.1
+sale-price-per-kg-tax-inclusive: 4.5

@@ -1,0 +1,5 @@
+recipe: mais
+loss-rate: 1.03
+dough-weight: 1.4
+bread-baked-weight: 1.250
+sale-price-per-kg-tax-inclusive: 5.5

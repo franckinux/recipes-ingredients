@@ -1,0 +1,5 @@
+recipe: campagne-nature
+loss-rate: 1.03
+dough-weight: 7.05
+bread-baked-weight: 6
+sale-price-per-kg-tax-inclusive: 4.5

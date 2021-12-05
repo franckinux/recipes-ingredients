@@ -1,0 +1,5 @@
+recipe: campagne-graines-topping
+loss-rate: 1.03
+dough-weight: 0.825
+bread-baked-weight: 0.7
+sale-price-per-kg-tax-inclusive: 6.50
