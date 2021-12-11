@@ -1,50 +1,49 @@
-extern crate yaml_rust;
-
-use std::io::prelude::*;
+use std::collections::HashMap;
+// use std::io::prelude::*;
 use std::fs::File;
-// use yaml_rust::yaml::{Hash, Yaml};
-use yaml_rust::{yaml, YamlLoader};
+
+use serde::Deserialize;
+use serde::de::DeserializeOwned;
 
 
-fn print_indent(indent: usize) {
-    for _ in 0..indent {
-        print!("    ");
+#[derive(Debug, PartialEq, Deserialize)]
+pub struct Ingredient {
+    pub price: f64,
+    pub provider: String,
+    pub conditioning: String,
+}
+
+
+impl Ingredient {
+    pub fn load_file <T: DeserializeOwned> (filename: &str) -> Result<HashMap<String, T>, serde_yaml::Error> {
+        let file = File::open(filename).expect(&format!("Unable to open file {}", filename));
+        let deserialized: HashMap<String, T> = serde_yaml::from_reader(file)?;
+        Ok(deserialized)
     }
 }
 
 
-fn dump_node(doc: &yaml::Yaml, indent: usize) {
-    match *doc {
-        yaml::Yaml::Array(ref v) => {
-            for x in v {
-                dump_node(x, indent + 1);
-            }
-        }
-        yaml::Yaml::Hash(ref h) => {
-            for (k, v) in h {
-                print_indent(indent);
-                println!("{:?}:", k);
-                dump_node(v, indent + 1);
-            }
-        }
-        _ => {
-            print_indent(indent);
-            println!("{:?}", doc);
-        }
+#[derive(Debug, PartialEq, Deserialize)]
+pub struct Product {
+    pub recipe: String,
+    pub loss_rate: f64,
+    pub dough_weight: f64,
+    pub bread_baked_weight: f64,
+    pub sale_price_per_kg_tax_inclusive: f64,
+}
+
+
+impl Product {
+    pub fn load_file <T: DeserializeOwned> (filename: &str) -> Result<T, serde_yaml::Error> {
+        let file = File::open(filename).expect(&format!("Unable to open file {}", filename));
+        let deserialized = serde_yaml::from_reader(file)?;
+        Ok(deserialized)
     }
 }
 
 
-pub fn load_file(file: &str) {
-    let mut file = File::open(file).expect("Unable to open file");
-    let mut contents = String::new();
-
-    file.read_to_string(&mut contents).expect("Unable to read file");
-
-    let docs = YamlLoader::load_from_str(&contents).unwrap();
-    for doc in &docs {
-        println!("---");
-        dump_node(doc, 0);
-    }
+pub fn load_file <T: DeserializeOwned> (filename: &str) -> Result<HashMap<String, T>, serde_yaml::Error> {
+    let file = File::open(filename).expect(&format!("Unable to open file {}", filename));
+    let deserialized = serde_yaml::from_reader(file)?;
+    Ok(deserialized)
 }
-
