@@ -1,4 +1,5 @@
 recipe: levain-seigle-120pch
-dough-weight: 0.3
+loss_rate: 1
+dough_weight: 0.3
 bread_baked_weight: -1
 sale_price_per_kg_tax_inclusive: -1

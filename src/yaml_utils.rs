@@ -6,6 +6,9 @@ use serde::Deserialize;
 use serde::de::DeserializeOwned;
 
 
+// ==========
+// Reading a HashMap of struct, applies tu Ingredient only
+
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct Ingredient {
     pub price: f64,
@@ -23,6 +26,28 @@ impl Ingredient {
 }
 
 
+// ==========
+// Reading a struct, applies to General and Product
+
+pub trait ReadStruct {
+    fn load_file <T: DeserializeOwned> (filename: &str) -> Result<T, serde_yaml::Error> {
+        let file = File::open(filename).expect(&format!("Unable to open file {}", filename));
+        let deserialized = serde_yaml::from_reader(file)?;
+        Ok(deserialized)
+    }
+}
+
+
+#[derive(Debug, PartialEq, Deserialize)]
+pub struct General {
+    pub vat: f64,
+}
+
+
+impl ReadStruct for General {
+}
+
+
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct Product {
     pub recipe: String,
@@ -33,14 +58,11 @@ pub struct Product {
 }
 
 
-impl Product {
-    pub fn load_file <T: DeserializeOwned> (filename: &str) -> Result<T, serde_yaml::Error> {
-        let file = File::open(filename).expect(&format!("Unable to open file {}", filename));
-        let deserialized = serde_yaml::from_reader(file)?;
-        Ok(deserialized)
-    }
+impl ReadStruct for Product {
 }
 
+// ==========
+// This one is for recipes only
 
 pub fn load_file <T: DeserializeOwned> (filename: &str) -> Result<HashMap<String, T>, serde_yaml::Error> {
     let file = File::open(filename).expect(&format!("Unable to open file {}", filename));
