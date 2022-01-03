@@ -7,17 +7,17 @@ use serde::de::DeserializeOwned;
 
 
 // ==========
-// Reading a HashMap of struct, applies tu Ingredient only
+// Reading a HashMap of struct, applies to RawMaterial only
 
 #[derive(Debug, PartialEq, Deserialize)]
-pub struct Ingredient {
+pub struct RawMaterial {
     pub price: f64,
     pub provider: String,
     pub conditioning: String,
 }
 
 
-impl Ingredient {
+impl RawMaterial {
     pub fn load_file <T: DeserializeOwned> (filename: &str) -> Result<HashMap<String, T>, serde_yaml::Error> {
         let file = File::open(filename).expect(&format!("Unable to open file {}", filename));
         let deserialized: HashMap<String, T> = serde_yaml::from_reader(file)?;
