@@ -1,6 +1,7 @@
 mod yaml_utils;
 
 use std::collections::HashMap;
+use std::ffi::OsStr;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -12,7 +13,7 @@ use yaml_utils::{General, RawMaterial, Product, ReadStruct};
 #[structopt(name = "basic")]
 struct Opt {
     /// Order files
-    #[structopt(short, long, parse(from_os_str), default_value="prix_revient.yaml")]
+    #[structopt(short, long, parse(from_os_str), default_value="prix_revient")]
     orders: Vec<PathBuf>,
 
     /// Html file
@@ -20,7 +21,7 @@ struct Opt {
     html: Option<PathBuf>,
 
     /// RawMaterials file
-    #[structopt(short, long, parse(from_os_str), default_value="matieres_premieres.yaml")]
+    #[structopt(short, long, parse(from_os_str), default_value="matieres_premieres")]
     raw_materials: PathBuf,
 }
 
@@ -45,8 +46,10 @@ fn follow_recipe(
     match raw_materials.get(recipe_name) {
         None => {
             // the raw material is not found in the raw_materials hash map, so this is a recipe
-            let recipe_file = format!("data/recipes/{}.yaml", recipe_name);
-            let recipe: Recipe = yaml_utils::load_file(recipe_file.as_str()).unwrap();
+            let mut recipe_pathbuf: PathBuf = [r"data", "recipes", recipe_name].iter().collect();
+            recipe_pathbuf.set_extension("yaml");
+            let recipe: Recipe = yaml_utils::load_file(recipe_pathbuf.as_path()).unwrap();
+
             let denominator: f64 = recipe.values().sum();
 
             let mut recipe_price = 0.0;
@@ -83,13 +86,14 @@ fn main() {
     let opt = Opt::from_args();
 
     // general
-    let general: General = General::load_file("data/general.yaml").unwrap();
-    // println!("{}", general.vat);
+    let general_pathbuf = PathBuf::from("data/general.yaml");
+    let general: General = General::load_file(general_pathbuf.as_path()).unwrap();
 
     // raw_material
     let raw_materials_file = opt.raw_materials.to_str().unwrap();
-    let raw_materials_path = format!("data/raw_materials/{}.yaml", raw_materials_file);
-    let raw_material: RawMaterials = RawMaterial::load_file(raw_materials_path.as_str()).unwrap();
+    let mut raw_materials_pathbuf: PathBuf = [r"data", "raw_materials", raw_materials_file].iter().collect();
+    raw_materials_pathbuf.set_extension("yaml");
+    let raw_material: RawMaterials = RawMaterial::load_file(raw_materials_pathbuf.as_path()).unwrap();
 
     // where the results are collected
     let mut products_end = HashMap::new();
@@ -98,20 +102,22 @@ fn main() {
     // loop over orders files
     for orders_pathbuf in opt.orders.iter() {
         let order_file = orders_pathbuf.to_str().unwrap();
-        let order_path = format!("data/orders/{}.yaml", order_file);
-        let orders: HashMap<String, i32> = yaml_utils::load_file(order_path.as_str()).unwrap();
+        let mut order_pathbuf: PathBuf = [r"data", "orders", order_file].iter().collect();
+        order_pathbuf.set_extension("yaml");
+        let orders: HashMap<String, i32> = yaml_utils::load_file(order_pathbuf.as_path()).unwrap();
 
         // loop over products of the order
         for (order_product, &order_quantity) in orders.iter() {
-            println!("from orde file: product {},  quantity {}", order_product, order_quantity);
+            println!("from order file: product {},  quantity {}", order_product, order_quantity);
 
             if order_quantity == 0 {
                 continue;
             }
 
-            let product_file = format!("data/products/{}.yaml", order_product);
-            println!("{}", product_file);
-            let product: Product = Product::load_file(product_file.as_str()).unwrap();
+            let mut product_pathbuf: PathBuf = [r"data", "products", order_product].iter().collect();
+            product_pathbuf.set_extension("yaml");
+            println!("{:?}", product_pathbuf.as_path());
+            let product: Product = Product::load_file(product_pathbuf.as_path()).unwrap();
 
             let dough_weight = product.dough_weight;
             let loss_rate = product.loss_rate;

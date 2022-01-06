@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 // use std::io::prelude::*;
 use std::fs::File;
+use std::path::Path;
 
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
@@ -18,8 +19,8 @@ pub struct RawMaterial {
 
 
 impl RawMaterial {
-    pub fn load_file <T: DeserializeOwned> (filename: &str) -> Result<HashMap<String, T>, serde_yaml::Error> {
-        let file = File::open(filename).expect(&format!("Unable to open file {}", filename));
+    pub fn load_file <T: DeserializeOwned> (filename: &Path) -> Result<HashMap<String, T>, serde_yaml::Error> {
+        let file = File::open(filename).expect(&format!("Unable to open file {}", filename.display()));
         let deserialized: HashMap<String, T> = serde_yaml::from_reader(file)?;
         Ok(deserialized)
     }
@@ -30,8 +31,8 @@ impl RawMaterial {
 // Reading a struct, applies to General and Product
 
 pub trait ReadStruct {
-    fn load_file <T: DeserializeOwned> (filename: &str) -> Result<T, serde_yaml::Error> {
-        let file = File::open(filename).expect(&format!("Unable to open file {}", filename));
+    fn load_file <T: DeserializeOwned> (filename: &Path) -> Result<T, serde_yaml::Error> {
+        let file = File::open(filename).expect(&format!("Unable to open file {}", filename.display()));
         let deserialized = serde_yaml::from_reader(file)?;
         Ok(deserialized)
     }
@@ -64,8 +65,8 @@ impl ReadStruct for Product {
 // ==========
 // This one is for recipes only
 
-pub fn load_file <T: DeserializeOwned> (filename: &str) -> Result<HashMap<String, T>, serde_yaml::Error> {
-    let file = File::open(filename).expect(&format!("Unable to open file {}", filename));
+pub fn load_file <T: DeserializeOwned> (filename: &Path) -> Result<HashMap<String, T>, serde_yaml::Error> {
+    let file = File::open(filename).expect(&format!("Unable to open file {}", filename.display()));
     let deserialized = serde_yaml::from_reader(file)?;
     Ok(deserialized)
 }
