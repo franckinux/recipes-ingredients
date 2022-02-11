@@ -1,7 +1,6 @@
 mod yaml_utils;
 
 use std::collections::HashMap;
-use std::ffi::OsStr;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -43,6 +42,9 @@ fn follow_recipe(
     recipe_name: &str,
     recipe_quantity: f64
 ) -> (f64, Recipe) {
+    // there may have an alias for the raw material
+    let recipe_names: Vec<&str> = recipe_name.split("|").collect();
+    let recipe_name = recipe_names[0];
     match raw_materials.get(recipe_name) {
         None => {
             // the raw material is not found in the raw_materials hash map, so this is a recipe
